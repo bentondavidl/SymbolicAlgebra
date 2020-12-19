@@ -16,11 +16,15 @@ class token(object):
     def __repr__(self):
         return f'{self.type}:{self.value}'
 
+    def __eq__(self, other):
+        return self.type == other.type and self.value == other.value
+
 
 def tokenizer(equation: str) -> list:
     """
     Converts equation strings to a list of tokens.
     """
+    equation = re.sub(r'([+\-*\/=<>])-([\d.]*)', r'\1 (0-\2)', equation)
     out = []
     number_buffer = []
     letter_buffer = []
@@ -40,6 +44,8 @@ def tokenizer(equation: str) -> list:
                 for letter in letter_buffer:
                     out.append(token('Variable', letter))
                 letter_buffer = []
+            if char == '^':
+                char = '**'
             out.append(token('Operator', char))
         elif char == '(':
             if len(letter_buffer) > 0:
@@ -68,7 +74,24 @@ def tokenizer(equation: str) -> list:
                     out.append(token('Variable', letter))
                 letter_buffer = []
             out.append(token('Function Argument Separator', char))
+        elif re.match(r'[=<>]', char):
+            if len(number_buffer) > 0:
+                out.append(token('Literal', ''.join(number_buffer)))
+                number_buffer = []
+            elif len(letter_buffer) > 0:
+                for letter in letter_buffer:
+                    out.append(token('Variable', letter))
+                letter_buffer = []
+            out.append(token('Comparator', char))
+
+    if len(number_buffer) > 0:
+        out.append(token('Literal', ''.join(number_buffer)))
+        number_buffer = []
+    if len(letter_buffer) > 0:
+        for letter in letter_buffer:
+            out.append(token('Variable', letter))
+        letter_buffer = []
     return out
 
 
-print(tokenizer('-444 +3.6 xa-  v(-3,5)'))
+# print(tokenizer('-444 +3.6 xa-  v(-3,5)'))
