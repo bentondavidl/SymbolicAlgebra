@@ -1,5 +1,6 @@
 from tokenizer import tokenizer
 from collections import deque
+import math
 
 
 class node(object):
@@ -44,10 +45,11 @@ def rpn(token_list):
         elif token.type == 'Function':
             operator.append(token)
         elif token.type == 'Operator':
-            while len(operator) > 0 and operator[-1].type == 'Operator' and (
+            while len(operator) > 0 and (
+                    operator[-1].type == 'Function' or operator[-1].type == 'Operator' and (
                     ops[operator[-1].value] > ops[token.value] or (
                         ops[operator[-1].value] > ops[token.value] and token.value == '^')
-            ) and token.type != 'Left Parenthesis':
+                    )) and token.type != 'Left Parenthesis':
                 output.appendleft(operator.pop())
             operator.append(token)
         elif token.value == 'Left Parenthesis':
@@ -87,7 +89,7 @@ def build(token_list: list):
         elif token.type == 'Literal' or token.type == 'Variable':
             curr.value = token
             curr = curr.parent
-            while curr.right is not None:
+            while curr.right is not None or curr.value.type == 'Function':
                 if curr.parent is None:
                     return curr
                 curr = curr.parent
@@ -105,6 +107,9 @@ def build(token_list: list):
 def solve_side(root: node):
     if root.value.type == 'Literal':
         return root.value.value
+    if root.value.type == 'Function':
+        temp = eval(f'math.{root.value.value}({solve_side(root.left)})')
+        return temp
     if root.value.type == 'Operator':
         temp = eval(
             f'{solve_side(root.right)} {root.value.value} {solve_side(root.left)}')
@@ -132,6 +137,3 @@ def solve(equation):
         result = eval(
             f'{solve_side(left_side)} {comp} {solve_side(right_side)}')
         print(f'The equation is {result}')
-
-
-solve('5.1+(4^0.5)/4-95=-89.4')

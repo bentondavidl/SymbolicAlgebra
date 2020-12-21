@@ -24,7 +24,7 @@ def tokenizer(equation: str) -> list:
     """
     Converts equation strings to a list of tokens.
     """
-    equation = re.sub(r'([+\-*\/=<>])-([\d.]*)', r'\1 (0-\2)', equation)
+    equation = re.sub(r'([+\-*\/=<>])-([\d.]*)', r'\1(0-\2)', equation)
     out = []
     number_buffer = []
     letter_buffer = []
@@ -92,6 +92,3 @@ def tokenizer(equation: str) -> list:
             out.append(token('Variable', letter))
         letter_buffer = []
     return out
-
-
-# print(tokenizer('-444 +3.6 xa-  v(-3,5)'))
