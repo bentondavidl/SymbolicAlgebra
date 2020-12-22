@@ -4,9 +4,7 @@ import math
 
 
 class node(object):
-    """
-    Node definition for use in a parse tree.
-    """
+    """Node definition for use in a parse tree."""
 
     def __init__(self, value=None, parent=None, right=None, left=None):
         self.value = value

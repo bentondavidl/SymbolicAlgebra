@@ -2,14 +2,9 @@ import re
 
 
 class token(object):
-    """
-    Representation for Literals, Variables, Operators, and Functions
-    """
+    """Representation for Literals, Variables, Operators, and Functions."""
 
     def __init__(self, _type, value):
-        """
-        Constructor for token class
-        """
         self.type = _type
         self.value = value
 
@@ -21,9 +16,7 @@ class token(object):
 
 
 def tokenizer(equation: str) -> list:
-    """
-    Converts equation strings to a list of tokens.
-    """
+    """Convert equation strings to a list of tokens."""
     equation = re.sub(r'([+\-*\/=<>])-([\d.]*)', r'\1(0-\2)', equation)
     out = []
     number_buffer = []
